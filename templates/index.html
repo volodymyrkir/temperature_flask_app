@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Temperature Converter</title>
+    <link rel="stylesheet" type="text/css" href="/static_files/stylesheet.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="left-content">
+            <h1>Temperature Converter</h1>
+            <form method="POST">
+                <p>Enter a temperature:</p>
+                <input type="number" step="1" name="temperature" value="{{ temperature }}" required>
+                <input type="submit" value="Convert">
+                <input type="hidden" name="conversion_type_val" value="{{ conversion_type_val }}">
+            </form>
+            <div class="message">
+                {% if conversion_type_val == 'celsius_to_fahrenheit' %}
+                {{ temperature }} Celsius is approximately {{ result }} Fahrenheit.
+                {% elif conversion_type_val == 'fahrenheit_to_celsius' %}
+                {{ temperature }} Fahrenheit is approximately {{ result }} Celsius.
+                {% endif %}
+            </div>
+           <form method="POST" action="/switch_conversion">
+                {% if conversion_type_val == 'celsius_to_fahrenheit' %}
+                <input type="hidden" name="conversion_type" value="fahrenheit_to_celsius">
+                <input type="submit" class="switch-button" value="Switch to Fahrenheit to Celsius">
+                {% else %}
+                <input type="hidden" name="conversion_type" value="celsius_to_fahrenheit">
+                <input type="submit" class="switch-button" value="Switch to Celsius to Fahrenheit">
+                {% endif %}
+            </form>
+        </div>
+        <div class="right-content">
+            <div class="weather-data">
+                <h2>Current World Temperatures</h2>
+                <table>
+                    <tr>
+                        <th>City</th>
+                        <th>Temperature (Celsius)</th>
+                        <th>Temperature (Fahrenheit)</th>
+                    </tr>
+                    {% for city, (temp_cels, temp_far) in weather_data.items() %}
+                    <tr>
+                        <td>{{ city }}</td>
+                        <td class="{% if conversion_type_val == 'fahrenheit_to_celsius' %}
+                                      {% if temp_cels|to_float == result %}green-bg
+                                      {% elif temp_cels|to_float > result %}light-red-bg
+                                      {% else %}light-blue-bg
+                                      {% endif %}
+                                   {% else %}
+                                      grey-bg
+                                   {% endif %}">
+                            {{ temp_cels }}°C
+                        </td>
+                        <td class="{% if conversion_type_val == 'celsius_to_fahrenheit' %}
+                                      {% if temp_far|to_float == result %}green-bg
+                                      {% elif temp_far|to_float > result %}light-red-bg
+                                      {% else %}light-blue-bg
+                                      {% endif %}
+                                   {% else %}
+                                      grey-bg
+                                   {% endif %}">
+                            {{ temp_far }}°F
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
